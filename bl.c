@@ -9,36 +9,36 @@
 /**
  * Device filee path (e.g. "/sys/class/backlight/intel_backlight/brightness")
  */
-static char devFilePath[PATH_MAX];
+static char dev_file_path[PATH_MAX];
 
-void setDevFilePath(const char *newDevFilePath) {
-    strcpy(devFilePath, newDevFilePath);
+void set_dev_file_path(const char *new_dev_file_path) {
+    strcpy(dev_file_path, new_dev_file_path);
 }
 
 /**
- * This function reads value from devFilePath, and stores to fetchBuff.
+ * This function reads value from dev_file_path, and stores to fetch_buff.
  * On success, it returns `0`.
  * On error, it returns non-zero;
  */
-int readDevFile(char *fetchBuff, size_t buffSize) {
-    if (devFilePath == NULL) {
+int read_dev_file(char *fetch_buff, size_t buff_size) {
+    if (dev_file_path == NULL) {
         fprintf(stderr, "device file path is not set.\n");
         return -1;
     }
-    if (access(devFilePath, F_OK) == -1) {
-        fprintf(stderr, "the device file not exists. (%s)\n", devFilePath);
+    if (access(dev_file_path, F_OK) == -1) {
+        fprintf(stderr, "the device file not exists. (%s)\n", dev_file_path);
         return -1;
     }
 
-    FILE *devfp = fopen(devFilePath, "r");
+    FILE *devfp = fopen(dev_file_path, "r");
     if (devfp == NULL) {
-        fprintf(stderr, "Couldn't read dev file (%s)\n", devFilePath);
+        fprintf(stderr, "Couldn't read dev file (%s)\n", dev_file_path);
         fclose(devfp);
         return -1;
     }
-    char *got = fgets(fetchBuff, buffSize, devfp);
+    char *got = fgets(fetch_buff, buff_size, devfp);
     if (got == NULL) {
-        fprintf(stderr, "Couldn't read dev file (%s)\n", devFilePath);
+        fprintf(stderr, "Couldn't read dev file (%s)\n", dev_file_path);
         fclose(devfp);
         return -1;
     }
@@ -46,20 +46,13 @@ int readDevFile(char *fetchBuff, size_t buffSize) {
     return 0;
 }
 
-// TODO: still writing...
-// unsigned int getBrightnessLevel() {
-//     uintmax_t num = strtoumax(s, NULL, 10);
-//     if (num == UINTMAX_MAX && errno == ERANGE)
-//             /* Could not convert. */
-// }
-
 int main(int argc, char const* argv[])
 {
     // I've not decided about whether device file be constant value or CLI argument
-    setDevFilePath("/sys/class/backlight/intel_backlight/brightness");
+    set_dev_file_path("/sys/class/backlight/intel_backlight/brightness");
 
     char buff[BUFF_SIZE];
-    int ret = readDevFile(buff, BUFF_SIZE);
+    int ret = read_dev_file(buff, BUFF_SIZE);
     if (ret != 0) {
         exit(1);
     }
