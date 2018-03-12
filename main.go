@@ -11,7 +11,29 @@ import (
 const blDevFilePath string = "/sys/class/backlight/intel_backlight/brightness"
 
 func main() {
-	level := getBrightnessLevel()
+	switch argLen := len(os.Args); argLen {
+	case 1:
+		level := getBrightnessLevel()
+		fmt.Println(level)
+	case 2:
+		switch incOrDecOrNum := os.Args[1]; incOrDecOrNum {
+		case "inc":
+			increaseBrightnessLevel()
+		case "dec":
+			decreaseBrightnessLevel()
+		default:
+			const bitSize = 32
+			newLevel, err := strconv.ParseInt(incOrDecOrNum, 10, bitSize)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Invalid argument. (%s)\n", incOrDecOrNum)
+				os.Exit(1)
+			}
+			setBrightnessLevel(uint32(newLevel))
+		}
+	default:
+		fmt.Fprintln(os.Stderr, "Invalid argument. (%v)", os.Args)
+		os.Exit(1)
+	}
 }
 
 func getBrightnessLevel() uint32 {
@@ -38,13 +60,30 @@ func getBrightnessLevel() uint32 {
 }
 
 func setBrightnessLevel(newLevel uint32) {
-	//ioutil.WriteFile(blDevFilePath,
-
-	// func WriteFile(filename string, data []byte, perm os.FileMode) error {
-	err := ioutil.WriteFile(blDevFilePath, []byte(string(newLevel)), "w")
+	info, err := os.Stat(blDevFilePath)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Couldn't write")
+		fmt.Fprintf(os.Stderr, "Couldn't get fileinfo (%v)\n", blDevFilePath)
+		os.Exit(1)
+	}
+
+	err = ioutil.WriteFile(
+		blDevFilePath,
+		[]byte(strconv.Itoa(int(newLevel))+"\n"),
+		info.Mode(),
+	)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't write to %v\n", blDevFilePath)
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
+}
+
+func increaseBrightnessLevel() {
+	level := getBrightnessLevel()
+	setBrightnessLevel(level + 100)
+}
+
+func decreaseBrightnessLevel() {
+	level := getBrightnessLevel()
+	setBrightnessLevel(level - 100)
 }
