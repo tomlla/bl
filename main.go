@@ -16,16 +16,16 @@ func main() {
 		level := getBrightnessLevel()
 		fmt.Println(level)
 	case 2:
-		switch incOrDecOrNum := os.Args[1]; incOrDecOrNum {
+		switch operationType := os.Args[1]; operationType {
 		case "inc":
 			increaseBrightnessLevel()
 		case "dec":
 			decreaseBrightnessLevel()
 		default:
 			const bitSize = 32
-			newLevel, err := strconv.ParseInt(incOrDecOrNum, 10, bitSize)
+			newLevel, err := strconv.ParseInt(operationType, 10, bitSize)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Invalid argument. (%s)\n", incOrDecOrNum)
+				fmt.Fprintf(os.Stderr, "Invalid argument. (%s)\n", operationType)
 				os.Exit(1)
 			}
 			setBrightnessLevel(uint32(newLevel))
