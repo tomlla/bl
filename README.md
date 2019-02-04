@@ -1,3 +1,3 @@
 # bl Brightness level controll command
 
-This is writing for rembering c.
+Linux bridgtness controll command for my laptop
