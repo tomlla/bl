@@ -31,7 +31,7 @@ func main() {
 			setBrightnessLevel(uint32(newLevel))
 		}
 	default:
-		fmt.Fprintln(os.Stderr, "Invalid argument. (%v)", os.Args)
+		fmt.Fprintf(os.Stderr, "Invalid argument. (%v)\n", os.Args)
 		os.Exit(1)
 	}
 }
@@ -52,7 +52,7 @@ func getBrightnessLevel() uint32 {
 	valueAsText := strings.TrimRight(string(bytes), "\n")
 	level, err := strconv.Atoi(valueAsText)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Couldn't convert from string to int\n")
+		fmt.Fprintf(os.Stderr, "Couldn't convert from string to int\n")
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
 	}
