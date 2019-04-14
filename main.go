@@ -3,10 +3,13 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 )
+
+const kbdBlDevFilePath string = "/sys/class/leds/asus::kbd_backlight/brightness"
 
 const blDevFilePath string = "/sys/class/backlight/intel_backlight/brightness"
 
@@ -21,6 +24,10 @@ func main() {
 			increaseBrightnessLevel()
 		case "dec":
 			decreaseBrightnessLevel()
+		case "kbd-on":
+			setKbdBackLight(kbdBlOn)
+		case "kbd-off":
+			setKbdBackLight(kbdBlOff)
 		default:
 			const bitSize = 32
 			newLevel, err := strconv.ParseInt(operationType, 10, bitSize)
@@ -32,6 +39,36 @@ func main() {
 		}
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid argument. (%v)\n", os.Args)
+		os.Exit(1)
+	}
+}
+
+type backlightState uint8
+
+const (
+	kbdBlOn backlightState = iota
+	kbdBlOff
+)
+
+func (state backlightState) bytes() []byte {
+	switch state {
+	case kbdBlOn:
+		return []byte("1\n")
+	case kbdBlOff:
+		return []byte("0\n")
+	default:
+		log.Fatalf("invalid backlightState")
+		return []byte("\n")
+	}
+}
+
+func setKbdBackLight(state backlightState) {
+	sysfile := kbdBlDevFilePath
+	info, err := os.Stat(sysfile)
+	err = ioutil.WriteFile(sysfile, state.bytes(), info.Mode())
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Couldn't write to %v\n", sysfile)
+		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 }
