@@ -26,5 +26,5 @@ Run `$ sudo visudo` and add a line like this.
 
 ```sudo
 
-nt ALL=(ALL) NOPASSWD: {{ bl command absolute path }}
+{{your unix user name}} ALL=(ALL) NOPASSWD: {{ bl command absolute path }}
 ```
