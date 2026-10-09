@@ -1,0 +1,15 @@
+version: "3"
+
+tasks:
+  default:
+    cmds:
+      - task --list-all
+
+
+  lint:
+    cmds:
+      - golangci-lint run
+
+  fmt:
+    cmds:
+      - golangci-lint fmt

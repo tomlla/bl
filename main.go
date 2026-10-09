@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -89,8 +88,7 @@ func (state backlightState) bytes() []byte {
 
 func setKbdBackLight(state backlightState) {
 	sysfile := kbdBlDevFilePath
-	info, err := os.Stat(sysfile)
-	err = ioutil.WriteFile(sysfile, state.bytes(), info.Mode())
+	err := os.WriteFile(sysfile, state.bytes(), 0o644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't write to %v\n", sysfile)
 		fmt.Fprintln(os.Stderr, err.Error())
@@ -121,17 +119,7 @@ func readSysUint(path string) uint32 {
 }
 
 func setBrightnessLevel(newLevel uint32) {
-	info, err := os.Stat(blDevFilePath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Couldn't get fileinfo (%v)\n", blDevFilePath)
-		os.Exit(1)
-	}
-
-	err = ioutil.WriteFile(
-		blDevFilePath,
-		[]byte(strconv.Itoa(int(newLevel))+"\n"),
-		info.Mode(),
-	)
+	err := os.WriteFile(blDevFilePath, []byte(strconv.Itoa(int(newLevel))+"\n"), 0o644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Couldn't write to %v\n", blDevFilePath)
 		fmt.Fprintln(os.Stderr, err.Error())
